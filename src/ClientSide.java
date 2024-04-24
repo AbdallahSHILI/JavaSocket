@@ -17,6 +17,12 @@ public class ClientSide {
 
             while (true) {
                 String str = userInput.readLine();
+                try {
+                    int x = Integer.parseInt(str);
+                } catch (NumberFormatException e) {
+                    System.out.println("[CLIENT]: Must enter a Number between 0 and 20");
+                    continue;
+                }
                 if (Integer.parseInt(str) > 20 || Integer.parseInt(str) < 0) {
                     System.out.println("[CLIENT]: Invalid number, only a number between 0 and 20");
                     continue;
@@ -26,15 +32,17 @@ public class ClientSide {
                 serverMessage = in.readLine();
                 System.out.println(serverMessage);
 
-                if (serverMessage.equals("[SERVER]: You won! replay? yes/no")) {
-                    String replayMessage = in.readLine();
-                    System.out.println(replayMessage);
+                if (serverMessage.contains("[SERVER]: You won!")) {
                     String userReplay = userInput.readLine();
                     out.println(userReplay);
-                    if (!userReplay.equalsIgnoreCase("yes")) {
+                    if (userReplay.equalsIgnoreCase("yes")) {
                         System.out.println("[CLIENT]: sending replay request to the server.");
+                        System.out.println(in.readLine());
                         continue;
                     } else {
+                        serverMessage = in.readLine();
+                        System.out.println(serverMessage);
+                        System.out.println("[CLIENT]: Exiting the game.");
                         break;
                     }
                 }

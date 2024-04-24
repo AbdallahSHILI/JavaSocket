@@ -9,7 +9,6 @@ public class ServerSide {
         try {
             ServerSocket ss = new ServerSocket(3000);
             System.out.println("[SERVER]: Server started. Waiting for Client response...");
-            System.out.println("[SERVER]: Server started. Waiting for Client response...");
             Socket soc = ss.accept();
             System.out.println("[SERVER]: Connection Successful");
 
@@ -40,10 +39,10 @@ public class ServerSide {
                         System.out.println("[SERVER]: Client accepted replay request");
                         randomNumber = random.nextInt(21);
                         System.out.println("[SERVER]: New number generated is " + randomNumber);
-                        randomNumber = random.nextInt(21);
                         out.println("[SERVER]: New game started. Guess a number between 0 and 20.");
                         continue;
                     } else {
+                        out.println("[SERVER]: Server shutting down...");
                         System.out.println("[SERVER]: Client Refused to replay, shutting down...");
                         break;
                     }
