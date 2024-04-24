@@ -70,5 +70,7 @@ This client-server number guessing game demonstrates the basic communication bet
 
 ## Team Members
 Abdallah Shilli, @AbdallahSHILI
+
 Ahmed Elj, @lorffine
+
 Zied Jarboui
