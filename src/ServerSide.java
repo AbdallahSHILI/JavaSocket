@@ -85,8 +85,21 @@ public class ServerSide {
 
                     if (guessedNumber == randomNumber) {
                         System.out.println("[SERVER]: " + ip + " won, sending 'winning' message to client");
-                        out.println("[SERVER]: You won! Game over.");
-                        break;
+                        out.println("[SERVER]: You won! Game over. replay again? (yes/no)");
+                        System.out.println("[SERVER]: Waiting for replay confirmation...");
+                        String userReplay = in.readLine();
+                        if(userReplay.equalsIgnoreCase("yes"))
+                        {
+                            Random random = new Random();
+                            randomNumber = random.nextInt(21);
+                            System.out.println("[SERVER]: Number generated is " + randomNumber);
+                            out.println("[SERVER]: Game started. Guess a number between 0 and 20.");
+                            continue;
+                        } else {
+                            System.out.println("[SERVER]:"+ ip +" refused replay request, shutting down...");
+                            break;  
+                        }
+
                     } else if (guessedNumber > randomNumber) {
                         out.println("[SERVER]: The number is lesser than " + guessedNumber);
                     } else if (guessedNumber < randomNumber) {
