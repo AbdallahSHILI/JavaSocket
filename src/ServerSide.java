@@ -10,13 +10,12 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 
 public class ServerSide {
-    private static final int MAX_CLIENTS = 2;
     private static int randomNumber;
-    private static final Socket[] clients = new Socket[MAX_CLIENTS];
-    private static final PrintWriter[] outputs = new PrintWriter[MAX_CLIENTS];
-    private static final BufferedReader[] inputs = new BufferedReader[MAX_CLIENTS];
+    private static final Socket[] clients = new Socket[2];
+    private static final PrintWriter[] outputs = new PrintWriter[2];
+    private static final BufferedReader[] inputs = new BufferedReader[2];
     private static int currentClient = 0; // Index of the current client to make a guess
-    private static CountDownLatch latch = new CountDownLatch(MAX_CLIENTS); // To wait for all clients to connect
+    private static CountDownLatch latch = new CountDownLatch(2); // To wait for all clients to connect
 
     public static int waitingClient() { // give the waiting player, not the current one.
         if (currentClient == 0) {
@@ -26,6 +25,9 @@ public class ServerSide {
         }
     }
 
+    // This method is called just to show the current IP address of the server, for
+    // easier client setup on dynamic IP.
+    // this method imported.
     public static void myip() {
         try {
             Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
@@ -61,10 +63,12 @@ public class ServerSide {
             myip(); // Print the IP address of the server
 
             // Accept two clients
-            for (int i = 0; i < MAX_CLIENTS; i++) {
+            for (int i = 0; i < 2; i++) {
                 Socket socket = serverSocket.accept();
-                clients[i] = socket;
+                clients[i] = socket; // Store the socket in the array.
+                // Create a print writer for each socket's output stream
                 outputs[i] = new PrintWriter(socket.getOutputStream(), true);
+                // Create a buffered reader for each socket's input stream.
                 inputs[i] = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 System.out.println("[SERVER]: Player " + (i + 1) + " connected.");
                 latch.countDown(); // Decrement the count of the latch
@@ -72,12 +76,15 @@ public class ServerSide {
 
             // Wait until all clients are connected
             latch.await();
-            // Initialize game
+
+            // Initialize secret number.
             Random random = new Random();
             randomNumber = random.nextInt(21);
+
             System.out.println("[SERVER]: Both Players Connected!\n[SERVER]: Game Started. Secret Number generated is "
                     + randomNumber);
-
+            // Send welcome messages to both players (currentClient is the first connected
+            // player).
             outputs[currentClient]
                     .println("[SERVER]: Hello player 1! the Game started, you must guess the right number!");
             outputs[waitingClient()].println(
@@ -97,11 +104,12 @@ public class ServerSide {
 
                 String guess = currentIn.readLine();
                 if (guess == null) {
-                    continue;
+                    continue; // retry if empty.
                 }
-                int guessedNumber = Integer.parseInt(guess);
+                int guessedNumber = Integer.parseInt(guess); // Convert input string to int
                 System.out.println("[SERVER]: Players " + (currentClient + 1) + " guessed " + guessedNumber);
 
+                // Check if Player's guess is correct
                 if (guessedNumber == randomNumber) {
                     currentOut.println("[SERVER]: You won! The game is over. replay? (yes/no)");
                     outputs[waitingClient()].println("[SERVER]: you lost, other player guessed it! [" + guessedNumber

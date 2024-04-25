@@ -3,6 +3,7 @@ import java.io.*;
 
 public class ClientSide {
 
+    // a method to receive a message from the server
     public static String serverMessage(Socket soc) {
         String message = "";
         try {
@@ -15,6 +16,7 @@ public class ClientSide {
         return message;
     }
 
+    // a method to send a message to the server
     public static void sendToServer(Socket soc, String message) {
         try {
             PrintWriter out = new PrintWriter(soc.getOutputStream(), true);
@@ -24,6 +26,7 @@ public class ClientSide {
         }
     }
 
+    // a method to get user input from keyboard
     public static String getUserInput() {
         String input = "";
         try {
@@ -38,18 +41,24 @@ public class ClientSide {
 
     public static void main(String[] args) {
         try {
+            // client asks for the IP address of the server or leaves empty for localhost
             System.out.println("[CLIENT]: Enter the IP address of the server or leave empty for localhost");
             String ip = getUserInput();
             if (ip == "")
                 ip = "localhost";
+
+            // client creates a socket connection with the server on port 3000
             Socket soc = new Socket(ip, 3000);
             System.out.println(
                     "[CLIENT]: Client Side started on port 3000\n[CLIENT]: Waiting for another player to join...");
 
+            // server's message watcher.
             while (true) {
 
                 String serverMessage = serverMessage(soc); // Read server message
 
+                // this is when the server sends a message to the client that it's the client's
+                // turn to guess.
                 if (serverMessage.contains("Guess the right number")) {
                     // It's this client's turn to guess.
                     while (true) {// Loop until the user enters a valid number.
@@ -62,7 +71,7 @@ public class ClientSide {
                             }
                             sendToServer(soc, str); // Send the number to the server.
                             break;
-                        } catch (NumberFormatException e) {
+                        } catch (NumberFormatException e) { // If the user enters something other than a number.
                             System.out.println("[CLIENT]: Must enter a Number between 0 and 20");
                             continue;
                         }
@@ -85,8 +94,6 @@ public class ClientSide {
                     continue;
                 }
             }
-
-            // soc.close();
         } catch (Exception e) {
             System.out.println("[CLIENT]: Connection error: " + e.getMessage());
         }
