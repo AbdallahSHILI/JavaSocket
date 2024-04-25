@@ -30,10 +30,10 @@ public class ServerSide {
                     continue;
                 }
                 int guessedNumber = Integer.parseInt(inputString);
-                System.out.println("[SERVER]: received " + inputString);
+                System.out.println("[SERVER]: received " + inputString + " from " + ip);
 
                 if (guessedNumber == randomNumber) {
-                    System.out.println("[SERVER]: Client won, sending 'winning' message to client");
+                    System.out.println("[SERVER]: "+ ip +" won, sending 'winning' message to client");
                     out.println("[SERVER]: You won! replay? yes/no");
 
                     System.out.println("[SERVER]: waiting for replay message...");
