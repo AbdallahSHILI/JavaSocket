@@ -2,14 +2,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.io.*;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Pattern;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.net.UnknownHostException;
 
 public class ServerSide {
     private static final int MAX_CLIENTS = 2;
