@@ -58,7 +58,7 @@ public class ServerSide {
             // Create a server socket
             ServerSocket serverSocket = new ServerSocket(3000);
             System.out.println("[SERVER]: Server started. Waiting for Players to join...");
-            myip();
+            myip(); // Print the IP address of the server
 
             // Accept two clients
             for (int i = 0; i < MAX_CLIENTS; i++) {
@@ -93,7 +93,7 @@ public class ServerSide {
                 BufferedReader currentIn = inputs[currentClient];
                 // Wait for client to guess
 
-                outputs[waitingClient()].println("[SERVER]: waiting for the other Player to guess...");
+                outputs[waitingClient()].println("[SERVER]: Please wait the other Player's turn...");
 
                 String guess = currentIn.readLine();
                 if (guess == null) {
@@ -103,9 +103,21 @@ public class ServerSide {
                 System.out.println("[SERVER]: Players " + (currentClient + 1) + " guessed " + guessedNumber);
 
                 if (guessedNumber == randomNumber) {
-                    currentOut.println("[SERVER]: You won! The game is over.");
-                    outputs[waitingClient()].println("[SERVER]: you lost...");
-                    break;
+                    currentOut.println("[SERVER]: You won! The game is over. replay? (yes/no)");
+                    outputs[waitingClient()].println("[SERVER]: you lost, other player guessed it! [" + guessedNumber
+                            + "]. replay? (yes/no)");
+
+                    String vote1 = currentIn.readLine().toLowerCase();
+                    String vote2 = inputs[waitingClient()].readLine().toLowerCase();
+                    if (vote1.equals("yes") && vote2.equals("yes")) {
+                        randomNumber = random.nextInt(21);
+                        System.out.println("[SERVER]: The game is restarted, the new number is " + randomNumber);
+                        outputs[currentClient].println("[SERVER]: The game is restarted");
+                        outputs[waitingClient()].println("[SERVER]: The game is restarted");
+                        continue;
+                    } else {
+                        break;
+                    }
                 } else if (guessedNumber > randomNumber) {
                     currentOut.println("[SERVER]: Sorry! The number is --lesser-- than [" + guessedNumber + "]");
                 } else {
@@ -124,5 +136,6 @@ public class ServerSide {
         } catch (Exception e) {
             System.out.println("[SERVER]: Error: " + e.getMessage());
         }
+        System.out.println("[SERVER]: Server stopped.");
     }
 }

@@ -70,26 +70,26 @@ public class ClientSide {
                 } else if (serverMessage.contains("won")) {
                     // Handle winning message and ask if they want to play again.
                     System.out.println(serverMessage);
-                    // String userReplay = getUserInput();
-                    // sendToServer(soc, userReplay);
-                    // if (!userReplay.equalsIgnoreCase("yes")) {
-                    // System.out.println("[CLIENT]: Exiting the game...");
-                    // break;
-                    // }
-                    break;
-                } else if (serverMessage.contains("lesser") || serverMessage.contains("greater")) {
-                    // Wait for the next prompt from the server.
+                    String userReplay = getUserInput();
+                    sendToServer(soc, userReplay);
+                    System.out.println(
+                            "[CLIENT]: Replay Request sent to Server, Loading...");
                     continue;
                 } else if (serverMessage.contains("lost")) {
                     // Handle losing message and ask if they want to play again.
                     System.out.println(serverMessage);
-                    break;
+                    String userReplay = getUserInput();
+                    sendToServer(soc, userReplay);
+                    System.out.println(
+                            "[CLIENT]: Replay Request sent to Server, Loading...");
+                    continue;
                 }
             }
 
-            soc.close();
+            // soc.close();
         } catch (Exception e) {
             System.out.println("[CLIENT]: Connection error: " + e.getMessage());
         }
+        System.out.println("[CLIENT]: Connection closed, shutting down...");
     }
 }
