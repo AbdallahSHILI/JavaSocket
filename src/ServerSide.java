@@ -8,17 +8,20 @@ public class ServerSide {
     public static void main(String[] args) {
         try {
             ServerSocket ss = new ServerSocket(3000);
-            System.out.println("[SERVER]: Server started. Waiting for Client response...");
+            System.out.println("[SERVER]: Server started. Waiting for Client to join...");
             Socket soc = ss.accept();
-            System.out.println("[SERVER]: Connection Successful");
+
+            String ip = soc.getInetAddress().getHostAddress();
+            System.out.println("[SERVER]: " + ip + " connected");
 
             Random random = new Random();
             int randomNumber = random.nextInt(21);
-            System.out.println("[SERVER]: number generated is " + randomNumber);
 
             BufferedReader in = new BufferedReader(new InputStreamReader(soc.getInputStream()));
             PrintWriter out = new PrintWriter(soc.getOutputStream(), true);
 
+            //starting the game
+            System.out.println("[SERVER]: number generated is " + randomNumber);
             out.println("[SERVER]: Guess a number between 0 and 20.");
 
             while (true) {
@@ -39,7 +42,7 @@ public class ServerSide {
                         System.out.println("[SERVER]: Client accepted replay request");
                         randomNumber = random.nextInt(21);
                         System.out.println("[SERVER]: New number generated is " + randomNumber);
-                        out.println("[SERVER]: New game started. Guess a number between 0 and 20.");
+                        out.println("[SERVER]: New game, Guess a number between 0 and 20.");
                         continue;
                     } else {
                         out.println("[SERVER]: Server shutting down...");

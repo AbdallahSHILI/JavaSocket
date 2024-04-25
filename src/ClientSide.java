@@ -11,7 +11,6 @@ public class ClientSide {
             BufferedReader in = new BufferedReader(new InputStreamReader(soc.getInputStream()));
             PrintWriter out = new PrintWriter(soc.getOutputStream(), true);
             BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
-
             String serverMessage = in.readLine();
             System.out.println(serverMessage);
 
