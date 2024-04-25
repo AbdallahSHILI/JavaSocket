@@ -45,39 +45,34 @@ public class ClientSide {
                 String serverMessage = serverMessage(soc); // Read server message
 
                 if (serverMessage.contains("Guess a number")) {
-                    // Now the game has started, and the client should send numbers.
-                    while (true) {
-                        String str = getUserInput();
-                        try {
-                            int x = Integer.parseInt(str);
-                            if (x > 20 || x < 0) {
-                                System.out.println("[CLIENT]: Invalid number, only a number between 0 and 20");
-                                continue;
-                            }
-                        } catch (NumberFormatException e) {
-                            System.out.println("[CLIENT]: Must enter a Number between 0 and 20");
+                    // It's this client's turn to guess.
+                    String str = getUserInput();
+                    try {
+                        int x = Integer.parseInt(str);
+                        if (x > 20 || x < 0) {
+                            System.out.println("[CLIENT]: Invalid number, only a number between 0 and 20");
                             continue;
                         }
-                        sendToServer(soc, str);
-                        serverMessage = serverMessage(soc);
-
-                        if (serverMessage.contains("won")) {
-                            System.out.println("[CLIENT]: waiting reply");
-                            String userReplay = getUserInput();
-                            sendToServer(soc, userReplay);
-                            if (userReplay.equalsIgnoreCase("yes")) {
-                                System.out.println("[CLIENT]: sending replay request to the server.");
-                                continue;
-                            } else {
-                                System.out.println("[CLIENT]: Exiting the game...");
-                                break;
-                            }
-                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("[CLIENT]: Must enter a Number between 0 and 20");
+                        continue;
                     }
-                    break; // Exit the outer loop if game is over or client exits
+                    sendToServer(soc, str);
+                } else if (serverMessage.contains("won")) {
+                    // Handle winning message and ask if they want to play again.
+                    System.out.println("[CLIENT]: You won! Do you want to play again? (yes/no)");
+                    String userReplay = getUserInput();
+                    sendToServer(soc, userReplay);
+                    if (!userReplay.equalsIgnoreCase("yes")) {
+                        System.out.println("[CLIENT]: Exiting the game...");
+                        break;
+                    }
+                } else if (serverMessage.contains("lesser") || serverMessage.contains("greater")) {
+                    // Wait for the next prompt from the server.
+                    continue;
                 } else {
-                    // Handle non-game-start messages, like waiting for other players.
-                    sendToServer(soc, getUserInput()); // Continue interacting based on server prompts.
+                    // If the server sends any other prompts, handle them generically.
+                    System.out.println("[CLIENT]: " + serverMessage);
                 }
             }
 
