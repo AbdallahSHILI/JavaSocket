@@ -55,7 +55,7 @@ public class ClientSide {
             // server's message watcher.
             while (true) {
 
-                String serverMessage = serverMessage(soc); // Read server message
+                String serverMessage = serverMessage(soc); // Read server message forever
 
                 // this is when the server sends a message to the client that it's the client's
                 // turn to guess.
@@ -79,7 +79,7 @@ public class ClientSide {
                 } else if (serverMessage.contains("won")) {
                     // Handle winning message and ask if they want to play again.
                     System.out.println(serverMessage);
-                    String userReplay = getUserInput();
+                    String userReplay = getUserInput(); // yes or no
                     sendToServer(soc, userReplay);
                     System.out.println(
                             "[CLIENT]: Replay Request sent to Server, Loading...");
