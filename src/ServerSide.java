@@ -121,6 +121,17 @@ public class ServerSide {
             serverSocket.close();
         } catch (Exception e) {
             System.out.println("[SERVER]: Error: " + e.getMessage());
+        } finally { // for resources cleanup before exiting
+            // Close PrintWriter and BufferedReader
+            for (int i = 0; i < 2; i++) {
+                try {
+                    outputs[i].close(); // Close PrintWriter
+                    inputs[i].close(); // Close BufferedReader
+                    clients[i].close(); // Close socket
+                } catch (Exception e) {
+                    System.out.println("[SERVER]: Error: " + e.getMessage());
+                }
+            }
         }
         System.out.println("[SERVER]: Server stopped.");
     }
