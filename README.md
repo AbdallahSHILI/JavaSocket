@@ -69,6 +69,7 @@ The server continues to receive guesses until the correct number is guessed or t
 This client-server number guessing game demonstrates the basic communication between a client and a server using sockets in Java. The client sends guesses to the server, and the server responds with hints until the correct number is guessed. Feel free to modify and enhance the code to add more features or improve the user experience.
 
 ## Team Members
+
 Abdallah Shilli, @AbdallahSHILI
 
 Ahmed Elj, @lorffine
