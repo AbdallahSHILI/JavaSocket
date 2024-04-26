@@ -1,9 +1,7 @@
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.io.*;
-import java.util.Enumeration;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
@@ -24,10 +22,6 @@ public class ServerSide {
             return 0;
         }
     }
-
-    // This method is called just to show the current IP address of the server, for
-    // easier client setup on dynamic IP.
-    // this method imported.
 
     public static void main(String[] args) {
         try {
