@@ -111,6 +111,7 @@ public class ServerSide {
 
                 // Check if Player's guess is correct
                 if (guessedNumber == randomNumber) {
+                    System.out.println("[SERVER]: Player " + (currentClient + 1) + " guessed the right number.");
                     currentOut.println("[SERVER]: You won! The game is over. replay? (yes/no)");
                     outputs[waitingClient()].println("[SERVER]: you lost, other player guessed it! [" + guessedNumber
                             + "]. replay? (yes/no)");
