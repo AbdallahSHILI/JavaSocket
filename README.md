@@ -72,6 +72,6 @@ This client-server number guessing game demonstrates the basic communication bet
 
 Abdallah Shilli, @AbdallahSHILI
 
-Ahmed Elj, @lorffine
+Ahmed Elj, @ahmed-elj
 
 Zied Jarboui
