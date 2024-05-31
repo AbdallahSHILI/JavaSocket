@@ -23,8 +23,33 @@ public class ServerSide {
         }
     }
 
+    public static int getNumberOfClients() {
+        System.out.println("[SERVER]: Enter the number of players allowed:");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        try {
+            int numClients = Integer.parseInt(reader.readLine());
+            if (numClients < 2) {
+                System.out.println("[SERVER]: The number of players must be at least 2.");
+                return getNumberOfClients(); // Retry if the number is less than 2
+            }
+            return numClients;
+        } catch (IOException | NumberFormatException e) {
+            System.out.println("[SERVER]: Invalid input. Please enter a valid number.");
+            return getNumberOfClients(); // Retry on invalid input
+        }
+    }
+
     public static void main(String[] args) {
         try {
+            // Get the number of clients allowed
+            int numClients = getNumberOfClients();
+
+            // Initialize arrays based on the number of clients
+            Socket[] clients = new Socket[numClients];
+            PrintWriter[] outputs = new PrintWriter[numClients];
+            BufferedReader[] inputs = new BufferedReader[numClients];
+            CountDownLatch latch = new CountDownLatch(numClients);
+
             // Create a server socket
             ServerSocket serverSocket = new ServerSocket(3000);
             System.out.println("[SERVER]: Server started. Waiting for Players to join...");
@@ -37,9 +62,10 @@ public class ServerSide {
                 System.out.println("Could not find this computer's address.");
             }
 
-            // Accept two clients
-            for (int i = 0; i < 2; i++) {
+            // Accept clients
+            for (int i = 0; i < numClients; i++) {
                 Socket socket = serverSocket.accept();
+
                 clients[i] = socket; // Store the socket in the array.
                 // Create a print writer for each socket's output stream
                 outputs[i] = new PrintWriter(socket.getOutputStream(), true);
@@ -52,27 +78,29 @@ public class ServerSide {
             // Wait until all clients are connected
             latch.await(); // if = 0
 
-            // 2 players joined
-
             // Initialize secret number.
             Random random = new Random();
             randomNumber = random.nextInt(21);
 
-            System.out.println("[SERVER]: Both Players Connected!\n[SERVER]: Gam7e Started. Secret Number generated is "
+            System.out.println("[SERVER]: All Players Connected!\n[SERVER]: Game Started. Secret Number generated is "
                     + randomNumber);
-            // Send welcome messages to both players (currentClient is the first connected
-            // player).
-            outputs[currentClient]
-                    .println("[SERVER]: Hello player 1! the Game started, you must guess the right number!");
-            outputs[waitingClient()].println(
-                    "[SERVER]: Hello player 2! the Game started, you must guess the right number! your turn is next.");
+
+            // Send welcome messages to all players
+            for (int i = 0; i < numClients; i++) {
+                outputs[i].println(
+                        "[SERVER]: Hello player " + (i + 1) + "! the Game started, you must guess the right number!");
+            }
 
             // Game loop
             while (true) {
                 System.out.println("[SERVER]: Waiting for Player " + (currentClient + 1) + " to guess...");
                 PrintWriter currentOut = outputs[currentClient];
                 currentOut.println("[SERVER]: Your Turn! Guess the right number between 0 and 20.");
-                outputs[waitingClient()].println("[SERVER]: Please wait the other Player's turn...");
+                for (int i = 0; i < numClients; i++) {
+                    if (i != currentClient) {
+                        outputs[i].println("[SERVER]: Please wait the other Player's turn...");
+                    }
+                }
 
                 BufferedReader currentIn = inputs[currentClient];
                 // Wait for client to guess
@@ -84,22 +112,33 @@ public class ServerSide {
 
                 int guessedNumber = Integer.parseInt(guess); // Convert input string to integer
 
-                System.out.println("[SERVER]: Players " + (currentClient + 1) + " guessed " + guessedNumber);
+                System.out.println("[SERVER]: Player " + (currentClient + 1) + " guessed " + guessedNumber);
 
                 // Check if Player's guess is correct
                 if (guessedNumber == randomNumber) {
                     System.out.println("[SERVER]: Player " + (currentClient + 1) + " guessed the right number.");
-                    currentOut.println("[SERVER]: You won! The game is over. replay? (yes/no)");
-                    outputs[waitingClient()].println("[SERVER]: you lost, other player guessed it! [" + guessedNumber
-                            + "]. replay? (yes/no)");
+                    currentOut.println("[SERVER]: You win! The game is over. replay? (yes/no)");
+                    for (int i = 0; i < numClients; i++) {
+                        if (i != currentClient) {
+                            outputs[i].println("[SERVER]: you lost, other player guessed it! [" + guessedNumber
+                                    + "]. replay? (yes/no)");
+                        }
+                    }
 
                     String vote1 = currentIn.readLine().toLowerCase();
-                    String vote2 = inputs[waitingClient()].readLine().toLowerCase();
-                    if (vote1.equals("yes") && vote2.equals("yes")) {
+                    boolean allAgreed = vote1.equals("yes");
+                    for (int i = 0; i < numClients; i++) {
+                        if (i != currentClient) {
+                            String vote = inputs[i].readLine().toLowerCase();
+                            allAgreed = allAgreed && vote.equals("yes");
+                        }
+                    }
+                    if (allAgreed) {
                         randomNumber = random.nextInt(21);
                         System.out.println("[SERVER]: The game is restarted, the new number is " + randomNumber);
-                        currentOut.println("[SERVER]: The game is restarted");
-                        outputs[waitingClient()].println("[SERVER]: The game is restarted");
+                        for (int i = 0; i < numClients; i++) {
+                            outputs[i].println("[SERVER]: The game is restarted");
+                        }
                         continue;
                     } else {
                         break;
@@ -111,7 +150,7 @@ public class ServerSide {
                 }
 
                 // Switch to the next client
-                currentClient = waitingClient(); // Switch to the next client
+                currentClient = (currentClient + 1) % numClients; // Switch to the next client
             }
 
             // Close resources
@@ -123,7 +162,7 @@ public class ServerSide {
             System.out.println("[SERVER]: Error: " + e.getMessage());
         } finally { // for resources cleanup before exiting
             // Close PrintWriter and BufferedReader
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < clients.length; i++) {
                 try {
                     outputs[i].close(); // Close PrintWriter
                     inputs[i].close(); // Close BufferedReader
